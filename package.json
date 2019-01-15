@@ -10,8 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.385.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "isomorphic-fetch": "^2.2.1",
     "next": "^7.0.2",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
