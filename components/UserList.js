@@ -1,5 +1,6 @@
 import React from "react";
 import Api from "../common/api";
+import { Button, Intent } from "@blueprintjs/core";
 
 class User extends React.Component {
   deleteUser = () => {
@@ -14,8 +15,13 @@ class User extends React.Component {
     return (
       <div>
         <span>{this.props.user.Username}</span>
-        <button onClick={this.editUser}>Edit</button>
-        <button onClick={this.deleteUser}>Delete</button>
+        <Button icon='edit' onClick={this.editUser} minimal={true} />
+        <Button
+          icon='trash'
+          onClick={this.deleteUser}
+          intent={Intent.DANGER}
+          minimal={true}
+        />
       </div>
     );
   }
