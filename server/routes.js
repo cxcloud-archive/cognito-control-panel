@@ -2,17 +2,14 @@ const aws = require("aws-sdk");
 const express = require("express");
 const router = express.Router();
 
-const REGION = "eu-west-1";
-const POOL_ID = "eu-west-1_9RgdWJ5c8";
-
 const client = new aws.CognitoIdentityServiceProvider({
-  region: REGION
+  region: process.env.COGNITO_REGION
 });
 
 router.get("/list-users", (req, res) => {
   client
     .listUsers({
-      UserPoolId: POOL_ID
+      UserPoolId: process.env.COGNITO_POOL_ID
     })
     .promise()
     .then(data => {
@@ -27,7 +24,7 @@ router.post("/admin-create-user", (req, res) => {
 
   client
     .adminCreateUser({
-      UserPoolId: POOL_ID,
+      UserPoolId: process.env.COGNITO_POOL_ID,
       MessageAction: "SUPPRESS",
       TemporaryPassword: "temp_Pass",
       UserAttributes: [
@@ -60,7 +57,7 @@ router.post("/admin-delete-user", (req, res) => {
 
   client
     .adminDeleteUser({
-      UserPoolId: POOL_ID,
+      UserPoolId: process.env.COGNITO_POOL_ID,
       Username: username
     })
     .promise()

@@ -1,14 +1,12 @@
-const API_URL = "http://localhost:3000/api";
-
 export default class Api {
   static async listUsers() {
-    return fetch(`${API_URL}/list-users`)
+    return fetch(`${process.env.API_URL}/list-users`)
       .then(res => res.json())
       .then(data => data.Users);
   }
 
   static async createUser() {
-    return fetch(`${API_URL}/admin-create-user`, {
+    return fetch(`${process.env.API_URL}/admin-create-user`, {
       method: "post",
       body: JSON.stringify({ aaa: "bbb" }),
       headers: {
@@ -23,7 +21,7 @@ export default class Api {
   static async editUser(username, attributes) {}
 
   static async deleteUser(username) {
-    return fetch(`${API_URL}/admin-delete-user`, {
+    return fetch(`${process.env.API_URL}/admin-delete-user`, {
       method: "post",
       body: JSON.stringify({ username: username }),
       headers: {
