@@ -5,6 +5,12 @@ export default class Api {
       .then(data => data.Users);
   }
 
+  static async getUser(username) {
+    return fetch(
+      `${process.env.API_URL}/admin-get-user?username=${username}`
+    ).then(res => res.json());
+  }
+
   static async createUser() {
     return fetch(`${process.env.API_URL}/admin-create-user`, {
       method: "post",

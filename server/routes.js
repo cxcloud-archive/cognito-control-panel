@@ -19,9 +19,6 @@ router.get("/list-users", (req, res) => {
 });
 
 router.post("/admin-create-user", (req, res) => {
-  console.log("ddd");
-  console.log(req.body);
-
   client
     .adminCreateUser({
       UserPoolId: process.env.COGNITO_POOL_ID,
@@ -64,6 +61,20 @@ router.post("/admin-delete-user", (req, res) => {
     .then(data => {
       console.log("---- user is deleted ----");
       console.log(data);
+    })
+    .catch(err => console.log(err));
+});
+
+router.get("/admin-get-user", (req, res) => {
+  const { username } = req.query;
+  client
+    .adminGetUser({
+      UserPoolId: process.env.COGNITO_POOL_ID,
+      Username: username
+    })
+    .promise()
+    .then(data => {
+      res.json(data);
     })
     .catch(err => console.log(err));
 });
