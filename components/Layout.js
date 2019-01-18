@@ -10,7 +10,7 @@ const Header = styled.header``;
 const Main = styled.main``;
 const Footer = styled.footer``;
 
-export default ({ children, title = "Default title" }) => (
+export default ({ children, title = "Cognito Control Panel" }) => (
   <Wrapper>
     <Head>
       <title>{title}</title>
