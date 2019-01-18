@@ -17,6 +17,9 @@ app
     server.use(bodyParser.urlencoded({ extended: true }));
 
     server.use("/api", routes);
+    server.get("/user/:username", (req, res) => {
+      return app.render(req, res, "/user", { username: req.params.username });
+    });
     server.get("*", (req, res) => {
       return handle(req, res);
     });
