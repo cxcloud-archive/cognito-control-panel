@@ -1,37 +1,43 @@
 import React from "react";
-import Api from "../common/api";
-import { Button, Intent } from "@blueprintjs/core";
+import ReactTable from "react-table";
+import Router from "next/router";
 
-class User extends React.Component {
-  deleteUser = () => {
-    Api.deleteUser(this.props.user.Username);
-  };
+const columnValues = ["Username", "name", "email", "custom:ssn"];
 
-  editUser = () => {
-    Api.editUser(this.props.Username);
-  };
+const columns = columnValues.map(column => {
+  if (column === "Username") {
+    return {
+      Header: "Username",
+      accessor: "Username"
+    };
+  } else {
+    return {
+      id: column,
+      Header: column,
+      // Header: column.replace("custom:", ""),
+      accessor: d => {
+        const obj = d.Attributes.find(item => item.Name === column);
+        return obj ? obj.Value : null;
+      }
+    };
+  }
+});
 
+export default class extends React.Component {
   render() {
     return (
       <div>
-        <span>{this.props.user.Username}</span>
-        <Button icon='edit' onClick={this.editUser} minimal={true} />
-        <Button
-          icon='trash'
-          onClick={this.deleteUser}
-          intent={Intent.DANGER}
-          minimal={true}
+        <ReactTable
+          data={this.props.users}
+          columns={columns}
+          className='-striped -highlight'
+          getTrProps={(state, rowInfo) => ({
+            onClick: () => {
+              Router.push(`/user/${rowInfo.row.Username}`);
+            }
+          })}
         />
       </div>
     );
   }
 }
-
-export default ({ users }) => (
-  <div>
-    <span>Users</span>
-    {users.map((user, key) => {
-      return <User key={key} user={user} />;
-    })}
-  </div>
-);
