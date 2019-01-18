@@ -17,6 +17,10 @@ export default class MyDocument extends Document {
       <html>
         <Head>
           <link
+            rel='stylesheet'
+            href='https://unpkg.com/react-table@latest/react-table.css'
+          />
+          <link
             href='https://unpkg.com/normalize.css@^7.0.0'
             rel='stylesheet'
           />
