@@ -2,6 +2,7 @@ import React from "react";
 import "isomorphic-fetch";
 import Layout from "../components/Layout";
 import UserList from "../components/UserList";
+import CreateUserDialog from "../components/CreateUserDialog";
 import Api from "../common/api";
 import { Button, Intent } from "@blueprintjs/core";
 
@@ -12,13 +13,23 @@ export default class extends React.PureComponent {
     };
   }
 
-  createUser() {
-    return Api.createUser();
+  constructor(props) {
+    super(props);
+    this.state = { isCreateUserDialogOpen: false };
   }
+
+  createUser = () => {
+    this.setState({ isCreateUserDialogOpen: true });
+    // return Api.createUser();
+  };
 
   render() {
     return (
       <Layout>
+        <CreateUserDialog
+          isOpen={this.state.isCreateUserDialogOpen}
+          onClose={() => this.setState({ isCreateUserDialogOpen: false })}
+        />
         <Button
           icon='plus'
           onClick={this.createUser}
