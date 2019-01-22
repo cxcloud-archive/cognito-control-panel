@@ -1,14 +1,19 @@
 import React from "react";
 import ReactTable from "react-table";
-import Router from "next/router";
+import Link from "next/link";
 
-const columnValues = ["Username", "name", "email", "custom:ssn"];
+const columnFields = ["Username", "name", "email", "custom:ssn"];
 
-const columns = columnValues.map(column => {
+const columns = columnFields.map(column => {
   if (column === "Username") {
     return {
       Header: "Username",
-      accessor: "Username"
+      accessor: "Username",
+      Cell: ({ value }) => (
+        <Link href={`/user/${value}`}>
+          <a>{value}</a>
+        </Link>
+      )
     };
   } else {
     return {
@@ -31,11 +36,6 @@ export default class extends React.Component {
           data={this.props.users}
           columns={columns}
           className='-striped -highlight'
-          getTrProps={(state, rowInfo) => ({
-            onClick: () => {
-              Router.push(`/user/${rowInfo.row.Username}`);
-            }
-          })}
         />
       </div>
     );
