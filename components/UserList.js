@@ -20,10 +20,7 @@ const columns = columnFields.map(column => {
       id: column,
       Header: column,
       // Header: column.replace("custom:", ""),
-      accessor: d => {
-        const obj = d.Attributes.find(item => item.Name === column);
-        return obj ? obj.Value : null;
-      }
+      accessor: d => d.UserAttributes[column]
     };
   }
 });

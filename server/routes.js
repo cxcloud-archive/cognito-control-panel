@@ -6,6 +6,12 @@ const client = new aws.CognitoIdentityServiceProvider({
   region: process.env.COGNITO_REGION
 });
 
+const reduceUserAttributes = attributes =>
+  attributes.reduce((obj, { Name, Value }) => {
+    obj[Name] = Value;
+    return obj;
+  }, {});
+
 router.get("/list-users", (req, res) => {
   client
     .listUsers({
@@ -13,12 +19,18 @@ router.get("/list-users", (req, res) => {
     })
     .promise()
     .then(data => {
-      res.json(data);
+      const users = data.Users.map(item => {
+        const { Attributes, ...rest } = item;
+        const UserAttributes = reduceUserAttributes(Attributes);
+        return Object.assign({}, { UserAttributes, ...rest });
+      });
+      res.json({ users });
     })
     .catch(err => console.log(err));
 });
 
 router.post("/admin-create-user", (req, res) => {
+  const email = "mpxy03a@gmail.com";
   client
     .adminCreateUser({
       UserPoolId: process.env.COGNITO_POOL_ID,
@@ -27,7 +39,7 @@ router.post("/admin-create-user", (req, res) => {
       UserAttributes: [
         {
           Name: "email",
-          Value: "mpxy03@gmail.com"
+          Value: email
         },
         {
           Name: "name",
@@ -38,14 +50,22 @@ router.post("/admin-create-user", (req, res) => {
           Value: "123456789"
         }
       ],
-      Username: "mpxy03@gmail.com"
+      Username: email
     })
     .promise()
-    .then(data => {
-      console.log("---- user created ----");
-      console.log(data);
-      res.json(data);
+    .then(data => res.json(data))
+    .catch(err => console.log(err));
+});
+
+router.post("/admin-update-user-attributes", (req, res) => {
+  const { username, UserAttributes } = req.body;
+  client
+    .adminDeleteUser({
+      UserPoolId: process.env.COGNITO_POOL_ID,
+      Username: username
     })
+    .promise()
+    .then(data => res.json(data))
     .catch(err => console.log(err));
 });
 
@@ -58,10 +78,7 @@ router.post("/admin-delete-user", (req, res) => {
       Username: username
     })
     .promise()
-    .then(data => {
-      console.log("---- user is deleted ----");
-      console.log(data);
-    })
+    .then(data => res.json(data))
     .catch(err => console.log(err));
 });
 
@@ -74,7 +91,9 @@ router.get("/admin-get-user", (req, res) => {
     })
     .promise()
     .then(data => {
-      res.json(data);
+      const UserAttributes = reduceUserAttributes(data.UserAttributes);
+      const user = Object.assign({}, { ...data, UserAttributes });
+      res.json(user);
     })
     .catch(err => console.log(err));
 });

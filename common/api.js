@@ -2,7 +2,7 @@ export default class Api {
   static async listUsers() {
     return fetch(`${process.env.API_URL}/list-users`)
       .then(res => res.json())
-      .then(data => data.Users);
+      .then(data => data.users);
   }
 
   static async getUser(username) {
