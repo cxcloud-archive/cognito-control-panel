@@ -6,11 +6,25 @@ const client = new aws.CognitoIdentityServiceProvider({
   region: process.env.COGNITO_REGION
 });
 
-const reduceUserAttributes = attributes =>
+/**
+ * Converts [{Name: 'foo', Value: 'bar'}] to {foo: 'bar'}
+ * @param {Array} attributes
+ */
+const pairUserAttributes = attributes =>
   attributes.reduce((obj, { Name, Value }) => {
     obj[Name] = Value;
     return obj;
   }, {});
+
+/**
+ * Converts {foo: 'bar'} to [{Name: 'foo', Value: 'bar'}]
+ * @param {Object} attributes
+ */
+const unpairUserAttributes = attributes =>
+  Object.keys(attributes).map(item => ({
+    Name: item,
+    Value: attributes[item]
+  }));
 
 router.get("/list-users", (req, res) => {
   client
@@ -21,7 +35,7 @@ router.get("/list-users", (req, res) => {
     .then(data => {
       const users = data.Users.map(item => {
         const { Attributes, ...rest } = item;
-        const UserAttributes = reduceUserAttributes(Attributes);
+        const UserAttributes = pairUserAttributes(Attributes);
         return Object.assign({}, { UserAttributes, ...rest });
       });
       res.json({ users });
@@ -60,9 +74,10 @@ router.post("/admin-create-user", (req, res) => {
 router.post("/admin-update-user-attributes", (req, res) => {
   const { username, UserAttributes } = req.body;
   client
-    .adminDeleteUser({
+    .adminUpdateUserAttributes({
       UserPoolId: process.env.COGNITO_POOL_ID,
-      Username: username
+      Username: username,
+      UserAttributes: unpairUserAttributes(UserAttributes)
     })
     .promise()
     .then(data => res.json(data))
@@ -91,7 +106,7 @@ router.get("/admin-get-user", (req, res) => {
     })
     .promise()
     .then(data => {
-      const UserAttributes = reduceUserAttributes(data.UserAttributes);
+      const UserAttributes = pairUserAttributes(data.UserAttributes);
       const user = Object.assign({}, { ...data, UserAttributes });
       res.json(user);
     })

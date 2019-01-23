@@ -24,7 +24,18 @@ export default class Api {
       .then(data => console.log("Created User:", data));
   }
 
-  static async editUser(username, attributes) {}
+  static async editUser(username, UserAttributes) {
+    return fetch(`${process.env.API_URL}/admin-update-user-attributes`, {
+      method: "post",
+      body: JSON.stringify({ username, UserAttributes }),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => console.log("Edit user:", data));
+  }
 
   static async deleteUser(username) {
     return fetch(`${process.env.API_URL}/admin-delete-user`, {
