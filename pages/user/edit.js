@@ -14,14 +14,8 @@ const Container = styled.div`
   justify-content: space-between;
   align-items: flex-start;
 `;
-export default class extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isDeleteDialogOpen: false
-    };
-  }
 
+export default class extends React.Component {
   static async getInitialProps({ query: { username } }) {
     const user = await Api.getUser(username);
     return {
@@ -29,15 +23,33 @@ export default class extends React.Component {
     };
   }
 
-  showDeleteDialog = () => {
-    this.setState({ isDeleteDialogOpen: true });
-  };
-  hideDeleteDialog = () => {
-    this.setState({ isDeleteDialogOpen: false });
-  };
-  deleteUser = () => Api.deleteUser(this.props.user.Username);
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: props.user,
+      isDeleteDialogOpen: false
+    };
+  }
 
-  editUser = values => Api.editUser(this.props.user.Username, values);
+  showDeleteDialog = () => this.setState({ isDeleteDialogOpen: true });
+
+  hideDeleteDialog = () => this.setState({ isDeleteDialogOpen: false });
+
+  deleteUser = () => Api.deleteUser(this.state.user.Username);
+
+  editUser = values => {
+    return Api.editUser(this.state.user.Username, values).then(() => {
+      this.setState({
+        user: {
+          ...this.state.user,
+          UserAttributes: {
+            ...this.state.user.UserAttributes,
+            ...values
+          }
+        }
+      });
+    });
+  };
 
   render() {
     return (
@@ -50,9 +62,9 @@ export default class extends React.Component {
           onConfirm={this.deleteUser}
           onClose={this.hideDeleteDialog}
         />
-        {this.props.user && (
+        {this.state.user && (
           <Container>
-            <FormGroup label='Username'>{this.props.user.Username}</FormGroup>
+            <FormGroup label='Username'>{this.state.user.Username}</FormGroup>
             <Button
               icon='trash'
               onClick={this.showDeleteDialog}
@@ -64,7 +76,7 @@ export default class extends React.Component {
           </Container>
         )}
         <UserForm
-          user={this.props.user}
+          user={this.state.user}
           formFields={process.env.FORM_FIELDS.split(",")}
           onSubmit={this.editUser}
           successMessage='User info was updated successfully'
