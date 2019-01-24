@@ -2,10 +2,7 @@ import React from "react";
 import { Form, Field } from "react-final-form";
 import { Button, Intent } from "@blueprintjs/core";
 import styled from "styled-components";
-import Api from "../common/api";
 import AppToaster from "../components/Toaster";
-
-const formFields = ["name", "email", "custom:ssn"];
 
 const Buttons = styled.div`
   display: flex;
@@ -15,73 +12,87 @@ const Buttons = styled.div`
     margin-right: 1rem;
   }
 `;
-export default class extends React.Component {
-  /**
-   * Removes user attributes missing in formFields
-   */
-  getInitialValues() {
-    return formFields.reduce(
-      (obj, key) => ({ ...obj, [key]: this.props.user.UserAttributes[key] }),
-      {}
+
+const onSubmit = async (propOnSubmit, values, successMessage) => {
+  propOnSubmit(values)
+    .then(res =>
+      AppToaster.show({
+        message: successMessage,
+        intent: Intent.SUCCESS
+      })
+    )
+    .catch(error =>
+      AppToaster.show({
+        message: "Something went wrong, please try again",
+        intent: Intent.DANGER
+      })
     );
+};
+
+/**
+ * Removes user attributes missing in FORM_FIELDS
+ */
+const getInitialValues = user => {
+  if (!user) {
+    return [];
   }
+  const FORM_FIELDS = process.env.FORM_FIELDS.split(",");
 
-  onSubmit = async values => {
-    await Api.editUser(this.props.user.Username, values)
-      .then(res =>
-        AppToaster.show({
-          message: "User info was updated successfully",
-          intent: Intent.SUCCESS
-        })
-      )
-      .catch(error =>
-        AppToaster.show({
-          message: "Something went wrong, please try again",
-          intent: Intent.DANGER
-        })
-      );
-  };
+  return FORM_FIELDS.reduce(
+    (obj, key) => ({
+      ...obj,
+      [key]: user.UserAttributes[key]
+    }),
+    {}
+  );
+};
 
-  render() {
-    return (
-      <Form
-        onSubmit={this.onSubmit}
-        initialValues={this.getInitialValues()}
-        render={({ handleSubmit, form, submitting, pristine }) => (
-          <form onSubmit={handleSubmit}>
-            {formFields.map((item, key) => (
-              <div className='bp3-form-group bp3-large' key={key}>
-                <label className='bp3-label'>{item}</label>
-                <div className='bp3-form-content'>
-                  <Field
-                    name={item}
-                    className='bp3-input bp3-large'
-                    component='input'
-                    type='text'
-                  />
-                </div>
-              </div>
-            ))}
-            <Buttons>
-              <Button
-                type='submit'
-                icon='tick'
-                disabled={submitting || pristine}
-                intent={Intent.SUCCESS}
-              >
-                Save
-              </Button>
-              <Button
-                icon='tick'
-                disabled={submitting || pristine}
-                onClick={form.reset}
-              >
-                Reset
-              </Button>
-            </Buttons>
-          </form>
-        )}
+const FormField = ({ fieldName }) => (
+  <div className='bp3-form-group bp3-large'>
+    <label className='bp3-label'>{fieldName}</label>
+    <div className='bp3-form-content'>
+      <Field
+        name={fieldName}
+        className='bp3-input bp3-large'
+        component='input'
+        type='text'
       />
-    );
-  }
-}
+    </div>
+  </div>
+);
+
+export default ({
+  user,
+  formFields,
+  onSubmit: propOnSubmit,
+  successMessage
+}) => (
+  <Form
+    onSubmit={values => onSubmit(propOnSubmit, values, successMessage)}
+    initialValues={getInitialValues(user)}
+    render={({ handleSubmit, form, submitting, pristine }) => (
+      <form onSubmit={handleSubmit}>
+        {formFields.map((item, key) => (
+          <FormField fieldName={item} key={key} />
+        ))}
+        <Buttons>
+          <Button
+            type='submit'
+            icon='tick'
+            disabled={submitting || pristine}
+            intent={Intent.SUCCESS}
+          >
+            Save
+          </Button>
+          <Button
+            icon='tick'
+            disabled={submitting || pristine}
+            onClick={form.reset}
+          >
+            Reset
+          </Button>
+        </Buttons>
+      </form>
+    )}
+  />
+);

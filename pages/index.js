@@ -5,6 +5,7 @@ import UserList from "../components/UserList";
 import CreateUserDialog from "../components/CreateUserDialog";
 import Api from "../common/api";
 import { Button, Intent } from "@blueprintjs/core";
+import Link from "next/link";
 
 export default class extends React.PureComponent {
   static async getInitialProps({ req }) {
@@ -20,7 +21,7 @@ export default class extends React.PureComponent {
 
   createUser = () => {
     this.setState({ isCreateUserDialogOpen: true });
-    // return Api.createUser();
+    return Api.createUser();
   };
 
   render() {
@@ -30,14 +31,11 @@ export default class extends React.PureComponent {
           isOpen={this.state.isCreateUserDialogOpen}
           onClose={() => this.setState({ isCreateUserDialogOpen: false })}
         />
-        <Button
-          icon='plus'
-          onClick={this.createUser}
-          intent={Intent.SUCCESS}
-          minimal={true}
-        >
-          Create User
-        </Button>
+        <Link href={"/user/create"}>
+          <Button icon='plus' intent={Intent.SUCCESS} minimal={true}>
+            Create User
+          </Button>
+        </Link>
         <UserList users={this.props.users} />
       </Layout>
     );

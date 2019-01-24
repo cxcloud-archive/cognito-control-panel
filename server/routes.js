@@ -44,26 +44,14 @@ router.get("/list-users", (req, res) => {
 });
 
 router.post("/admin-create-user", (req, res) => {
-  const email = "mpxy03a@gmail.com";
+  const { UserAttributes } = req.body;
+  const { email } = UserAttributes;
   client
     .adminCreateUser({
       UserPoolId: process.env.COGNITO_POOL_ID,
       MessageAction: "SUPPRESS",
       TemporaryPassword: "temp_Pass",
-      UserAttributes: [
-        {
-          Name: "email",
-          Value: email
-        },
-        {
-          Name: "name",
-          Value: "Mesut"
-        },
-        {
-          Name: "custom:ssn",
-          Value: "123456789"
-        }
-      ],
+      UserAttributes: unpairUserAttributes(UserAttributes),
       Username: email
     })
     .promise()

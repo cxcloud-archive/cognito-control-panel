@@ -11,10 +11,10 @@ export default class Api {
     ).then(res => res.json());
   }
 
-  static async createUser() {
+  static async createUser(UserAttributes) {
     return fetch(`${process.env.API_URL}/admin-create-user`, {
       method: "post",
-      body: JSON.stringify({ aaa: "bbb" }),
+      body: JSON.stringify({ UserAttributes }),
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
