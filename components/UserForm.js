@@ -32,13 +32,12 @@ const onSubmit = async (propOnSubmit, values, successMessage) => {
 /**
  * Removes user attributes missing in FORM_FIELDS
  */
-const getInitialValues = user => {
+const getInitialValues = (user, formFields) => {
   if (!user) {
     return [];
   }
-  const FORM_FIELDS = process.env.FORM_FIELDS.split(",");
 
-  return FORM_FIELDS.reduce(
+  return formFields.reduce(
     (obj, key) => ({
       ...obj,
       [key]: user.UserAttributes[key]
@@ -69,7 +68,7 @@ export default ({
 }) => (
   <Form
     onSubmit={values => onSubmit(propOnSubmit, values, successMessage)}
-    initialValues={getInitialValues(user)}
+    initialValues={getInitialValues(user, formFields)}
     render={({ handleSubmit, form, submitting, pristine }) => (
       <form onSubmit={handleSubmit}>
         {formFields.map((item, key) => (
